@@ -5,6 +5,7 @@ import MySelect from "./UI/select/MySelect";
 const PostFilter = ({filter, setFilter}) => {
     return (
         <div>
+            <hr style={{margin: '15px 0'}}/>
             <MyInput
                 placeholder={'Search...'}
                 value={filter.query}

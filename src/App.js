@@ -1,21 +1,23 @@
 import React, {useMemo, useState} from 'react';
-import '../src/styles/App.css'
+import '../src/styles/App.scss'
 import PostList from "./components/PostList";
 import PostForm from "./components/PostForm";
-import MySelect from "./components/UI/select/MySelect";
-import MyInput from "./components/UI/input/MyInput";
 import PostFilter from "./components/PostFilter";
+import MyModal from "./components/UI/modal/MyModal";
+import MyButton from "./components/UI/button/MyButton";
 
 function App() {
     const [posts, setPosts] = useState([]);
     const [filter, setFilter] = useState({sort: '', query: ''});
+    const [modal, setModal] = useState(false);
 
     const createPost = (newPost) => {
-        setPosts([...posts, newPost])
+        setPosts([...posts, newPost]);
+        setModal(false);
     }
 
     const removePost = (post) => {
-        setPosts(posts.filter(p => p.id !== post.id))
+        setPosts(posts.filter(p => p.id !== post.id));
     }
 
     const sortedPosts = useMemo(() => {
@@ -30,7 +32,17 @@ function App() {
 
   return (
     <div className="App">
-        <PostForm create={createPost} title={'Create New Post'}/>
+        <MyButton
+            name={'Create Post'}
+            style={{marginTop: 30}}
+            onClick={() => setModal(true)}
+        />
+        <MyModal
+            visible={modal}
+            setVisible={setModal}
+        >
+            <PostForm create={createPost} title={'Create New Post'}/>
+        </MyModal>
         <PostFilter
             filter={filter}
             setFilter={setFilter}
