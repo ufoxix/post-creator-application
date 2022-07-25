@@ -1,13 +1,14 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import '../src/styles/App.css'
 import PostList from "./components/PostList";
 import PostForm from "./components/PostForm";
 import MySelect from "./components/UI/select/MySelect";
+import MyInput from "./components/UI/input/MyInput";
+import PostFilter from "./components/PostFilter";
 
 function App() {
     const [posts, setPosts] = useState([]);
-
-    const [selectedSort, setSelectedSort] = useState('');
+    const [filter, setFilter] = useState({sort: '', query: ''});
 
     const createPost = (newPost) => {
         setPosts([...posts, newPost])
@@ -17,28 +18,24 @@ function App() {
         setPosts(posts.filter(p => p.id !== post.id))
     }
 
-    const sortPostList = (sort) => {
-        setSelectedSort(sort);
-        setPosts([...posts].sort((a, b) => a[sort].localeCompare(b[sort])))
-    }
+    const sortedPosts = useMemo(() => {
+        return filter.sort
+            ? [...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]))
+            : posts;
+    }, [filter.sort, posts]);
+
+    const sortedAndSearchedPosts = useMemo(() => {
+        return sortedPosts.filter(post => post.title.toLowerCase().includes(filter.query.toLowerCase()))
+    }, [filter.query, sortedPosts]);
 
   return (
     <div className="App">
         <PostForm create={createPost} title={'Create New Post'}/>
-        <MySelect
-            value={selectedSort}
-            onChange={sortPostList}
-            defaultValue='Sorted by'
-            options={[
-                {value: 'title', name: 'By Title'},
-                {value: 'description', name: 'By Description'}
-            ]}
+        <PostFilter
+            filter={filter}
+            setFilter={setFilter}
         />
-        {
-            posts.length !== 0
-                ? <PostList remove={removePost} posts={posts} title={'Posts List'}/>
-                : <></>
-        }
+        <PostList remove={removePost} posts={sortedAndSearchedPosts} title={'Posts List'}/>
     </div>
   );
 }
